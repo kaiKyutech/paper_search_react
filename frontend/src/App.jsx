@@ -1,18 +1,29 @@
 import { useState } from 'react'
 import './App.css'
+import SearchBar from './components/SearchBar.jsx'
+import SearchOptions from './components/SearchOptions.jsx'
+import PaperList from './components/PaperList.jsx'
+import ChatPanel from './components/ChatPanel.jsx'
 
 function App() {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState([])
+  const [options, setOptions] = useState({})
+  const [papers, setPapers] = useState([])
   const [loading, setLoading] = useState(false)
+  const [selectedPaper, setSelectedPaper] = useState(null)
 
-  const search = async () => {
-    if (!query) return
+  const handleSearch = async ({ query, mode }) => {
     setLoading(true)
+    setSelectedPaper(null)
     try {
-      const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`)
+      const params = new URLSearchParams({
+        query,
+        year_from: options.yearFrom || 2020,
+        year_to: options.yearTo || 2025,
+        limit: options.numPapers || 10,
+      })
+      const res = await fetch(`/api/search?${params}`)
       const data = await res.json()
-      setResults(data)
+      setPapers(data)
     } catch (e) {
       console.error(e)
     } finally {
@@ -22,25 +33,12 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Paper Search</h1>
-      <div>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search papers"
-        />
-        <button onClick={search}>Search</button>
-      </div>
-      {loading && <p>Loading...</p>}
-      <ul>
-        {results.map((paper) => (
-          <li key={paper.paperId}>
-            <a href={paper.url} target="_blank" rel="noreferrer">
-              {paper.title}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <h1>論文検索</h1>
+      <SearchBar onSearch={handleSearch} />
+      <SearchOptions onChange={setOptions} />
+      {loading && <p>検索中...</p>}
+      <PaperList papers={papers} onSelect={setSelectedPaper} />
+      <ChatPanel paper={selectedPaper} />
     </div>
   )
 }

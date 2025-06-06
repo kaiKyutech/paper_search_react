@@ -38,3 +38,18 @@ def search_papers(query: str = Query(..., description="検索クエリ"), year_f
     data = resp.json()
     return data.get("data", [])
 
+
+from pydantic import BaseModel
+
+class ChatRequest(BaseModel):
+    question: str
+    paper: dict
+
+class ChatResponse(BaseModel):
+    answer: str
+
+@app.post('/api/chat', response_model=ChatResponse)
+def chat(req: ChatRequest):
+    answer = f"質問: {req.question}\n論文タイトル: {req.paper.get('title', '')}"
+    return ChatResponse(answer=answer)
+

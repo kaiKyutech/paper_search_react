@@ -1,6 +1,7 @@
 # paper_search_react
 
-このリポジトリは [paper_search](https://github.com/kaiKyutech/paper_search) を参考に、React と FastAPI で構成し直したサンプルアプリです。
+このリポジトリは [paper_search](https://github.com/kaiKyutech/paper_search) を参考に、React と FastAPI で構成し直したアプリです。
+検索結果から論文を選択し簡易チャットで内容を確認できます。
 
 ## 使い方
 
@@ -21,3 +22,4 @@ docker run -p 8000:8000 paper-search
 - バックエンド: FastAPI
 
 バックエンドは Semantic Scholar API を利用して論文検索を行います。
+
