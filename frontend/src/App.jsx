@@ -1,26 +1,19 @@
 import { useState } from 'react'
 import './App.css'
 import SearchBar from './components/SearchBar.jsx'
-import SearchOptions from './components/SearchOptions.jsx'
 import PaperList from './components/PaperList.jsx'
-import ChatPanel from './components/ChatPanel.jsx'
+import { Container, Box } from '@mui/material'
 
 function App() {
-  const [options, setOptions] = useState({})
   const [papers, setPapers] = useState([])
   const [loading, setLoading] = useState(false)
-  const [selectedPaper, setSelectedPaper] = useState(null)
+  const [searched, setSearched] = useState(false)
 
-  const handleSearch = async ({ query, mode }) => {
+  const handleSearch = async (query) => {
     setLoading(true)
-    setSelectedPaper(null)
+    setSearched(true)
     try {
-      const params = new URLSearchParams({
-        query,
-        year_from: options.yearFrom || 2020,
-        year_to: options.yearTo || 2025,
-        limit: options.numPapers || 10,
-      })
+      const params = new URLSearchParams({ query })
       const res = await fetch(`/api/search?${params}`)
       const data = await res.json()
       setPapers(data)
@@ -32,14 +25,13 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <h1>論文検索</h1>
-      <SearchBar onSearch={handleSearch} />
-      <SearchOptions onChange={setOptions} />
+    <Container maxWidth="md" className="App">
+      <Box sx={{ mt: searched ? 2 : 20, mb: 4 }}>
+        <SearchBar onSearch={handleSearch} />
+      </Box>
       {loading && <p>検索中...</p>}
-      <PaperList papers={papers} onSelect={setSelectedPaper} />
-      <ChatPanel paper={selectedPaper} />
-    </div>
+      <PaperList papers={papers} />
+    </Container>
   )
 }
 
