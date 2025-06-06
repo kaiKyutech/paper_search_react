@@ -14,10 +14,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# フロントエンドのビルド成果物を静的ファイルとして提供
-frontend_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
-if frontend_dist.exists():
-    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
+# フロントエンドのビルド成果物のパス
+# Docker イメージでは `/app/frontend/dist` に配置される
+frontend_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
 SEMANTIC_SCHOLAR_URL = "http://api.semanticscholar.org/graph/v1/paper/search/"
 
@@ -52,4 +51,8 @@ class ChatResponse(BaseModel):
 def chat(req: ChatRequest):
     answer = f"質問: {req.question}\n論文タイトル: {req.paper.get('title', '')}"
     return ChatResponse(answer=answer)
+
+# ビルド済みフロントエンドを提供
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
 
