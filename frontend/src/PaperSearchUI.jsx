@@ -6,6 +6,7 @@ const PaperSearchUI = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearched, setIsSearched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchMode, setSearchMode] = useState('keyword');
   const [filters, setFilters] = useState({
     year: '',
     category: '',
@@ -137,6 +138,31 @@ const PaperSearchUI = () => {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="mb-4 flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setSearchMode('keyword')}
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                searchMode === 'keyword'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              キーワード検索
+            </button>
+            <button
+              type="button"
+              onClick={() => setSearchMode('ai')}
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                searchMode === 'ai'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              AI検索
+            </button>
+          </div>
+
           <div className="relative mb-4">
             <div className="relative flex items-center border border-gray-300 rounded-lg px-4 py-3 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200">
               <Search className="w-5 h-5 text-gray-400 mr-3" />
@@ -145,7 +171,7 @@ const PaperSearchUI = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                className="flex-1 outline-none text-gray-700 text-lg"
+                className="flex-1 outline-none text-gray-700 text-lg bg-white"
                 placeholder="論文のタイトル、著者、キーワードで検索..."
               />
               {searchQuery && (
