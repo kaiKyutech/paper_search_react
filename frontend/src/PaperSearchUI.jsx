@@ -1,11 +1,25 @@
 import React, { useState } from 'react';
-import { Search, X, FileText, Calendar, Users, ExternalLink, Eye, Star } from 'lucide-react';
+import {
+  Search,
+  X,
+  FileText,
+  Calendar,
+  Users,
+  ExternalLink,
+  Eye,
+  Star,
+  Settings,
+  UserCircle,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react';
 
 const PaperSearchUI = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearched, setIsSearched] = useState(false);
   const [viewMode, setViewMode] = useState('results');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [searchMode, setSearchMode] = useState('keyword');
   const [filters, setFilters] = useState({
@@ -234,28 +248,60 @@ const PaperSearchUI = () => {
 
       {isSearched && (
         <div className="max-w-6xl mx-auto px-4 pb-8 flex">
-          <aside className="w-48 mr-6">
-            <div className="bg-white rounded-lg shadow-sm border p-4 space-y-2">
+          {sidebarOpen ? (
+            <aside className="w-48 mr-6 flex flex-col">
+              <div className="bg-white rounded-lg shadow-sm border p-4 space-y-2 flex-1">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('results')}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
+                    viewMode === 'results' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  検索結果
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('network')}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
+                    viewMode === 'network' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  ネットワーク
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('settings')}
+                  className={`w-full flex items-center text-left px-3 py-2 rounded-md text-sm font-medium ${
+                    viewMode === 'settings' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  <Settings className="w-4 h-4 mr-2" />設定
+                </button>
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border mt-2 p-3 flex items-center space-x-2 text-sm">
+                <UserCircle className="w-4 h-4" />
+                <span>ゲスト</span>
+              </div>
               <button
                 type="button"
-                onClick={() => setViewMode('results')}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                  viewMode === 'results' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-                }`}
+                onClick={() => setSidebarOpen(false)}
+                className="mt-2 self-end text-gray-500 hover:text-gray-700"
               >
-                検索結果
+                <ChevronLeft className="w-4 h-4" />
               </button>
+            </aside>
+          ) : (
+            <div className="mr-6">
               <button
                 type="button"
-                onClick={() => setViewMode('network')}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                  viewMode === 'network' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-                }`}
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 bg-white border rounded shadow-sm"
               >
-                ネットワーク
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-          </aside>
+          )}
           <div className="flex-1">
             {viewMode === 'results' && (
               <>
@@ -334,6 +380,11 @@ const PaperSearchUI = () => {
             {viewMode === 'network' && (
               <div className="bg-white rounded-lg shadow-sm border p-6 text-center text-gray-600">
                 ネットワーク表示はまだ実装されていません
+              </div>
+            )}
+            {viewMode === 'settings' && (
+              <div className="bg-white rounded-lg shadow-sm border p-6 text-center text-gray-600">
+                設定画面はまだ実装されていません
               </div>
             )}
           </div>
