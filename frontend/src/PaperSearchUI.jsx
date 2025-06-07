@@ -143,22 +143,78 @@ const PaperSearchUI = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center space-x-4">
+    <div className="min-h-screen bg-gray-50 flex">
+      {sidebarOpen ? (
+        <aside className="w-56 bg-white border-r flex flex-col relative">
+          <div className="p-4 flex-1 space-y-2">
             <button
               type="button"
-              onClick={resetSearch}
-              className="flex items-center space-x-2 focus:outline-none"
+              onClick={() => setViewMode('results')}
+              className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
+                viewMode === 'results' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+              }`}
             >
-              <FileText className="w-8 h-8 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-800">Paper Search</h1>
+              検索結果
             </button>
-            <div className="text-sm text-gray-500">学術論文検索エンジン</div>
+            <button
+              type="button"
+              onClick={() => setViewMode('network')}
+              className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
+                viewMode === 'network' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              ネットワーク
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('settings')}
+              className={`w-full flex items-center text-left px-3 py-2 rounded-md text-sm font-medium ${
+                viewMode === 'settings' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              <Settings className="w-4 h-4 mr-2" />設定
+            </button>
+          </div>
+          <div className="p-4 border-t flex items-center space-x-2 text-sm">
+            <UserCircle className="w-4 h-4" />
+            <span>ゲスト</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            className="absolute top-2 -right-3 p-1 bg-white border rounded-full shadow"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+        </aside>
+      ) : (
+        <div className="w-8 bg-white border-r flex flex-col items-center">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="mt-2 p-1 rounded hover:bg-gray-100"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      <div className="flex-1 flex flex-col">
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="flex items-center space-x-4">
+              <button
+                type="button"
+                onClick={resetSearch}
+                className="flex items-center space-x-2 focus:outline-none"
+              >
+                <FileText className="w-8 h-8 text-blue-600" />
+                <h1 className="text-2xl font-bold text-gray-800">Paper Search</h1>
+              </button>
+              <div className="text-sm text-gray-500">学術論文検索エンジン</div>
+            </div>
           </div>
         </div>
-      </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -247,62 +303,8 @@ const PaperSearchUI = () => {
       </div>
 
       {isSearched && (
-        <div className="max-w-6xl mx-auto px-4 pb-8 flex">
-          {sidebarOpen ? (
-            <aside className="w-48 mr-6 flex flex-col">
-              <div className="bg-white rounded-lg shadow-sm border p-4 space-y-2 flex-1">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('results')}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    viewMode === 'results' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  検索結果
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('network')}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    viewMode === 'network' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  ネットワーク
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('settings')}
-                  className={`w-full flex items-center text-left px-3 py-2 rounded-md text-sm font-medium ${
-                    viewMode === 'settings' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  <Settings className="w-4 h-4 mr-2" />設定
-                </button>
-              </div>
-              <div className="bg-white rounded-lg shadow-sm border mt-2 p-3 flex items-center space-x-2 text-sm">
-                <UserCircle className="w-4 h-4" />
-                <span>ゲスト</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(false)}
-                className="mt-2 self-end text-gray-500 hover:text-gray-700"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            </aside>
-          ) : (
-            <div className="mr-6">
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(true)}
-                className="p-2 bg-white border rounded shadow-sm"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-          <div className="flex-1">
+        <div className="max-w-6xl mx-auto px-4 pb-8">
+          <div>
             {viewMode === 'results' && (
               <>
                 <div className="mb-4 text-sm text-gray-600">{searchResults.length} 件の論文が見つかりました</div>
