@@ -2,6 +2,7 @@
 
 ```
 paper_search_react/
+├── AGENTS.md
 ├── Dockerfile
 ├── backend
 │   ├── app
@@ -28,6 +29,72 @@ paper_search_react/
     └── vite.config.js
 ```
 
+### File: AGENTS.md
+
+```markdown
+# Codex エージェント向けガイドライン
+
+以下は本リポジトリで作業を行う際の指針です。変更を加える前に必ず目を通してください。
+
+## 現在のディレクトリ構成
+
+```
+paper_search_react/
+├── AGENTS.md
+├── Dockerfile
+├── backend
+│   ├── app
+│   │   └── main.py
+│   └── requirements.txt
+└── frontend
+    ├── eslint.config.js
+    ├── index.html
+    ├── public
+    │   └── vite.svg
+    ├── src
+    │   ├── App.css
+    │   ├── App.jsx
+    │   ├── PaperSearchUI.jsx
+    │   ├── assets
+    │   │   └── react.svg
+    │   ├── components
+    │   │   ├── ChatPanel.jsx
+    │   │   ├── PaperList.jsx
+    │   │   ├── SearchBar.jsx
+    │   │   └── SearchOptions.jsx
+    │   ├── index.css
+    │   └── main.jsx
+    └── vite.config.js
+```
+
+ファイル構成を変更した際は `pulling_files.py` を実行し、このツリー情報を更新してからコミットしてください。
+
+## コードスタイル
+
+### Python (FastAPI)
+- [PEP8](https://pep8-ja.readthedocs.io/ja/latest/) に準拠
+- インデントは4スペース
+- クラス名は **PascalCase**
+- 変数名・関数名は **snake_case**
+- コメントおよび docstring は日本語で記述
+
+### TypeScript / React
+- `Prettier` と `ESLint` の利用を推奨
+- インデントは2スペース
+- コンポーネント名は **PascalCase**
+- 変数名・関数名は **camelCase**
+- コメントは日本語で記述
+- UI 部品は再利用可能な形で `components/` に配置
+- API アクセスは `utils/apiClient.ts` にまとめること
+- 可能であれば `material-ui` を利用して視認性の高い UI を心掛ける
+
+## Pull Request
+- 本文は日本語で作成すること
+- 変更内容の概要、動作確認手順、関連 Issue があれば記載してください
+
+
+```
+
 ### File: Dockerfile
 
 ```
@@ -47,79 +114,6 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY backend ./backend
 COPY --from=frontend /app/frontend/dist ./frontend/dist
 CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-```
-
-### File: backend/requirements.txt
-
-```
-fastapi
-uvicorn[standard]
-requests
-
-```
-
-### File: backend/app/main.py
-
-```python
-from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-import requests
-from pathlib import Path
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# フロントエンドのビルド成果物のパス
-# Docker イメージでは `/app/frontend/dist` に配置される
-frontend_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
-
-SEMANTIC_SCHOLAR_URL = "http://api.semanticscholar.org/graph/v1/paper/search/"
-
-@app.get("/api/search")
-def search_papers(query: str = Query(..., description="検索クエリ"), year_from: int = 2023, year_to: int | None = None, limit: int = 20):
-    params = {
-        "query": query,
-        "fields": "title,abstract,url",
-        "limit": limit,
-        "sort": "relevance",
-    }
-    if year_to is not None:
-        params["year"] = f"{year_from}-{year_to}"
-    else:
-        params["year"] = f"{year_from}-"
-
-    resp = requests.get(SEMANTIC_SCHOLAR_URL, params=params)
-    data = resp.json()
-    return data.get("data", [])
-
-
-from pydantic import BaseModel
-
-class ChatRequest(BaseModel):
-    question: str
-    paper: dict
-
-class ChatResponse(BaseModel):
-    answer: str
-
-@app.post('/api/chat', response_model=ChatResponse)
-def chat(req: ChatRequest):
-    answer = f"質問: {req.question}\n論文タイトル: {req.paper.get('title', '')}"
-    return ChatResponse(answer=answer)
-
-# ビルド済みフロントエンドを提供
-if frontend_dist.exists():
-    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
-
 
 ```
 
@@ -199,6 +193,13 @@ export default defineConfig({
 
 ```
 
+### File: frontend/public/vite.svg
+
+```
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
+
+```
+
 ### File: frontend/src/App.css
 
 ```css
@@ -237,7 +238,7 @@ export default defineConfig({
 
 ### File: frontend/src/App.jsx
 
-```
+```javascript
 import PaperSearchUI from './PaperSearchUI.jsx';
 
 export default function App() {
@@ -249,7 +250,7 @@ export default function App() {
 
 ### File: frontend/src/PaperSearchUI.jsx
 
-```
+```javascript
 import React, { useState } from 'react';
 import {
   Search,
@@ -701,7 +702,7 @@ body {
 
 ### File: frontend/src/main.jsx
 
-```
+```javascript
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
@@ -717,7 +718,7 @@ createRoot(document.getElementById('root')).render(
 
 ### File: frontend/src/components/ChatPanel.jsx
 
-```
+```javascript
 import { useState } from 'react'
 
 export default function ChatPanel({ paper }) {
@@ -756,7 +757,7 @@ export default function ChatPanel({ paper }) {
 
 ### File: frontend/src/components/PaperList.jsx
 
-```
+```javascript
 export default function PaperList({ papers, onSelect }) {
   if (!papers || papers.length === 0) {
     return <p>結果がありません</p>
@@ -777,7 +778,7 @@ export default function PaperList({ papers, onSelect }) {
 
 ### File: frontend/src/components/SearchBar.jsx
 
-```
+```javascript
 import { useState } from 'react'
 
 export default function SearchBar({ onSearch }) {
@@ -838,7 +839,7 @@ export default function SearchBar({ onSearch }) {
 
 ### File: frontend/src/components/SearchOptions.jsx
 
-```
+```javascript
 import { useState } from 'react'
 
 export default function SearchOptions({ onChange }) {
@@ -919,10 +920,76 @@ export default function SearchOptions({ onChange }) {
 
 ```
 
-### File: frontend/public/vite.svg
+### File: backend/requirements.txt
 
 ```
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
+fastapi
+uvicorn[standard]
+requests
+
+```
+
+### File: backend/app/main.py
+
+```python
+from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import requests
+from pathlib import Path
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# フロントエンドのビルド成果物のパス
+# Docker イメージでは `/app/frontend/dist` に配置される
+frontend_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+
+SEMANTIC_SCHOLAR_URL = "http://api.semanticscholar.org/graph/v1/paper/search/"
+
+@app.get("/api/search")
+def search_papers(query: str = Query(..., description="検索クエリ"), year_from: int = 2023, year_to: int | None = None, limit: int = 20):
+    params = {
+        "query": query,
+        "fields": "title,abstract,url",
+        "limit": limit,
+        "sort": "relevance",
+    }
+    if year_to is not None:
+        params["year"] = f"{year_from}-{year_to}"
+    else:
+        params["year"] = f"{year_from}-"
+
+    resp = requests.get(SEMANTIC_SCHOLAR_URL, params=params)
+    data = resp.json()
+    return data.get("data", [])
+
+
+from pydantic import BaseModel
+
+class ChatRequest(BaseModel):
+    question: str
+    paper: dict
+
+class ChatResponse(BaseModel):
+    answer: str
+
+@app.post('/api/chat', response_model=ChatResponse)
+def chat(req: ChatRequest):
+    answer = f"質問: {req.question}\n論文タイトル: {req.paper.get('title', '')}"
+    return ChatResponse(answer=answer)
+
+# ビルド済みフロントエンドを提供
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
+
 
 ```
 
