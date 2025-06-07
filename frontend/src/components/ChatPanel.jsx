@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Box, Typography, TextField, Button, Paper } from '@mui/material'
 
 export default function ChatPanel({ paper }) {
   const [history, setHistory] = useState([])
@@ -16,18 +17,27 @@ export default function ChatPanel({ paper }) {
     setInput('')
   }
 
-  if (!paper) return <p>論文を選択してください</p>
+  if (!paper) return <Typography>論文を選択してください</Typography>
 
   return (
-    <div className="chat-panel">
-      <h2>{paper.title}</h2>
-      <div className="chat-history">
+    <Box sx={{ mt: 4 }}>
+      <Typography variant="h6" gutterBottom>{paper.title}</Typography>
+      <Paper variant="outlined" sx={{ p: 1, mb: 1, maxHeight: 200, overflow: 'auto' }}>
         {history.map((msg, idx) => (
-          <div key={idx} className={msg.role}>{msg.content}</div>
+          <Typography key={idx} sx={{ textAlign: msg.role === 'user' ? 'right' : 'left' }}>
+            {msg.content}
+          </Typography>
         ))}
-      </div>
-      <textarea value={input} onChange={(e) => setInput(e.target.value)} rows={3} />
-      <button onClick={send}>送信</button>
-    </div>
+      </Paper>
+      <TextField
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        multiline
+        rows={3}
+        fullWidth
+        sx={{ mb: 1 }}
+      />
+      <Button variant="contained" onClick={send}>送信</Button>
+    </Box>
   )
 }

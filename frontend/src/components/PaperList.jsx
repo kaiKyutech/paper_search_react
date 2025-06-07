@@ -1,15 +1,16 @@
+import { List, ListItem, ListItemText } from '@mui/material'
+
 export default function PaperList({ papers, onSelect }) {
   if (!papers || papers.length === 0) {
     return <p>結果がありません</p>
   }
   return (
-    <ul className="paper-list">
+    <List>
       {papers.map((p, i) => (
-        <li key={i} onClick={() => onSelect(p)}>
-          <strong>{p.title}</strong>
-          <p>{p.abstract}</p>
-        </li>
+        <ListItem key={i} button onClick={() => onSelect(p)}>
+          <ListItemText primary={p.title} secondary={p.abstract} />
+        </ListItem>
       ))}
-    </ul>
+    </List>
   )
 }
