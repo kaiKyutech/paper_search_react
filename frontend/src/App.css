@@ -28,3 +28,8 @@
   padding: 0.5rem;
   margin-bottom: 0.5rem;
 }
+
+.paper-network {
+  margin-top: 1rem;
+  border: 1px solid #ccc;
+}
