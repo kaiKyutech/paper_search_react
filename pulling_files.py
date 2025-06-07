@@ -34,6 +34,9 @@ def get_language_from_extension(filename):
     language_map = {
         ".py": "python",
         ".js": "javascript",
+        ".jsx": "javascript",
+        ".ts": "typescript",
+        ".tsx": "typescript",
         ".html": "html",
         ".css": "css",
         ".java": "java",
@@ -45,7 +48,6 @@ def get_language_from_extension(filename):
         ".md": "markdown",
         ".sh": "bash",
         ".rb": "ruby",
-        # 他の拡張子は必要に応じて追加してください
     }
     return language_map.get(ext, "")
 
