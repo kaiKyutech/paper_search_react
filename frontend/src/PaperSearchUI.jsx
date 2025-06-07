@@ -5,6 +5,7 @@ const PaperSearchUI = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearched, setIsSearched] = useState(false);
+  const [viewMode, setViewMode] = useState('results');
   const [isLoading, setIsLoading] = useState(false);
   const [searchMode, setSearchMode] = useState('keyword');
   const [filters, setFilters] = useState({
@@ -120,6 +121,11 @@ const PaperSearchUI = () => {
     setSearchQuery('');
     setIsSearched(false);
     setSearchResults([]);
+    setViewMode('results');
+  };
+
+  const resetSearch = () => {
+    clearSearch();
   };
 
   return (
@@ -127,10 +133,14 @@ const PaperSearchUI = () => {
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+            <button
+              type="button"
+              onClick={resetSearch}
+              className="flex items-center space-x-2 focus:outline-none"
+            >
               <FileText className="w-8 h-8 text-blue-600" />
               <h1 className="text-2xl font-bold text-gray-800">Paper Search</h1>
-            </div>
+            </button>
             <div className="text-sm text-gray-500">学術論文検索エンジン</div>
           </div>
         </div>
@@ -223,11 +233,36 @@ const PaperSearchUI = () => {
       </div>
 
       {isSearched && (
-        <div className="max-w-4xl mx-auto px-4 pb-8">
-          <div className="mb-4 text-sm text-gray-600">{searchResults.length} 件の論文が見つかりました</div>
-          <div className="space-y-6">
-            {searchResults.map((paper) => (
-              <div key={paper.id} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
+        <div className="max-w-6xl mx-auto px-4 pb-8 flex">
+          <aside className="w-48 mr-6">
+            <div className="bg-white rounded-lg shadow-sm border p-4 space-y-2">
+              <button
+                type="button"
+                onClick={() => setViewMode('results')}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
+                  viewMode === 'results' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                検索結果
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('network')}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
+                  viewMode === 'network' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                ネットワーク
+              </button>
+            </div>
+          </aside>
+          <div className="flex-1">
+            {viewMode === 'results' && (
+              <>
+                <div className="mb-4 text-sm text-gray-600">{searchResults.length} 件の論文が見つかりました</div>
+                <div className="space-y-6">
+                  {searchResults.map((paper) => (
+                    <div key={paper.id} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer mb-2">{paper.title}</h3>
                   <div className="flex items-center space-x-2 text-sm text-gray-500">
@@ -293,6 +328,15 @@ const PaperSearchUI = () => {
               <p className="text-gray-500">別のキーワードで検索してみてください</p>
             </div>
           )}
+        </>
+      )}
+
+            {viewMode === 'network' && (
+              <div className="bg-white rounded-lg shadow-sm border p-6 text-center text-gray-600">
+                ネットワーク表示はまだ実装されていません
+              </div>
+            )}
+          </div>
         </div>
       )}
 
